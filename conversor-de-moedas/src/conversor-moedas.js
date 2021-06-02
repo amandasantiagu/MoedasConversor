@@ -18,6 +18,7 @@ function ConversorMoedas() {
   const [formValidado, setFormValidado] = useState(false);
   const [exibirModal, setExibirModal] = useState(false);
   const [resultadoConversao, setResultadoConversao] = useState('');
+  const [exibirMsgErro, setExibirMsgErro] = useState(false);
 
 
   function handleValue(event){
@@ -47,11 +48,16 @@ function ConversorMoedas() {
       setExibirSpinner(true);
       axios.get(FIXER_URL)
         .then(res => {
-          const cotacao = obterCotacao(res.data)
+          const cotacao = obterCotacao(res.data);
+          if (cotacao){
           setResultadoConversao(`${value} ${moedaDe} = ${cotacao} ${moedaPara}`);
-          setExibirModal(true)
-          setExibirSpinner(false)
-        })
+          setExibirModal(true);
+          setExibirSpinner(false);
+          setExibirMsgErro(false);
+        } else{
+          exibirErro();
+        }
+        }).catch(err => exibirErro());
     }
   }
 
@@ -65,10 +71,16 @@ function ConversorMoedas() {
     return cotacao.toFixed(2)
   }
 
+  function exibirErro(){
+    setExibirMsgErro(true)
+    setExibirSpinner(false);
+
+  }
+
   return (
   <div>
     <h1> Projetinho Pai </h1>
-    <Alert variant='danger' show={false}>
+    <Alert variant='danger' show={exibirMsgErro}>
       Erro! tente novamente.
     </Alert>
     <Jumbotron style={{ background:"pink", padding:'45px'}}> 
